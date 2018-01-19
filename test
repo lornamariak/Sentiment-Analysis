@@ -1,0 +1,57 @@
+library(tidyverse)
+library(syuzhet)
+library(tm)
+
+
+
+#time to clean our data
+#cleaning lib tm comes in action
+
+
+newdata<- iconv(transcripts$transcript, "ASCII", "UTF-8", sub="")
+
+#extract text from the data frame build your own corpus(a corpus is a collection of text files)
+mydata <- Corpus(VectorSource(newdata))
+
+# convert to lower case
+mydata <- tm_map(mydata, content_transformer(tolower))
+
+#remove ������ what would be emojis
+mydata<-tm_map(mydata, content_transformer(gsub), pattern="\\W",replace=" ")
+
+# remove URLs
+removeURL <- function(x) gsub("http[^[:space:]]*", "", x)
+mydata <- tm_map(mydata, content_transformer(removeURL)
+)
+# remove anything other than English letters or space
+removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x)
+mydata <- tm_map(mydata, content_transformer(removeNumPunct))
+
+# remove stopwords
+mydata <- tm_map(mydata, removeWords, stopwords("english"))
+
+#u can create custom stop words using the code below.
+#myStopwords <- c(setdiff(stopwords('english'), c("r", "big")),"use", "see", "used", "via", "amp")
+#mydata <- tm_map(mydata, removeWords, myStopwords)
+
+# remove extra whitespace
+mydata <- tm_map(mydata, stripWhitespace)
+
+# Remove numbers
+mydata <- tm_map(mydata, removeNumbers)
+
+# Remove punctuations
+mydata <- tm_map(mydata, removePunctuation)
+
+# keep a copy for stem completion later
+mydataCopy <- mydata
+
+
+result <- get_nrc_sentiment(as.character(mydataCopy))
+
+colSums(result)
+
+#x<-as.data.frame(colSums(result),ncol(2))
+#colnames(x)<- c("sentiment")
+
+#qplot(sentiment, data=x, geom="bar",fill=sentiment)+ggtitle("Sentiments")
