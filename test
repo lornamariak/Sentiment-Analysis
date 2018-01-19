@@ -1,4 +1,4 @@
-library(tidyverse)
+
 library(syuzhet)
 library(tm)
 
@@ -51,7 +51,4 @@ result <- get_nrc_sentiment(as.character(mydataCopy))
 
 colSums(result)
 
-#x<-as.data.frame(colSums(result),ncol(2))
-#colnames(x)<- c("sentiment")
 
-#qplot(sentiment, data=x, geom="bar",fill=sentiment)+ggtitle("Sentiments")
